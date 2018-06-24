@@ -26,3 +26,18 @@ Required Python packages:
 - cv2
 - statsmodels
 - umap
+
+We would like to acknowledge the following open source resources:
+- SciPy: Jones E., Oliphant E., Peterson P., et al. SciPy: Open Source Scientific Tools for Python, 2001
+- Numpy: Oliphant E. A., guide to NumPy, USA: Trelgol Publishing, (2006).
+- Matplotlib: Hunter J. D., Matplotlib: A 2D graphics environment, Computing In Science & Engineering, (2007)
+- Scikit-learn: Pedregosa et al., Scikit-learn: Machine learning in Python, JMLR 12, pp. 2825-2830, (2011)
+- Ilastik: Sommer C., Strähle  C., Köthe U., Hamprecht F. A. , ilastik: Interactive Learning and Segmentation Toolkit, Eighth IEEE International Symposium on Biomedical Imaging (ISBI) Proceedings, (2011)
+- UMAP: McInnes L. and Healy J., UMAP:  Uniform Manifold Approximation and Projection for Dimension Reduction https://arxiv.org/abs/1802.03426 (2018)
+- Pandas: 
+Pandas: McKinney W. Data Structures for Statistical Computing in Python, Proceedings of the 9th Python in Science Conference, 51-56 (2010)
+- Scikit-image: van der Walt S. et al., scikit-image: Image processing in Python, PeerJ 2:e453 (2014) 
+- IPython: Perez F., Granger B.E. IPython: A System for Interactive Scientific Computing, Computing in Science & Engineering, 9, 21-29 (2007), 
+- Seaborn: https://seaborn.pydata.org/
+- Statsmodels: Skipper S., and  Perktold J.. Statsmodels: Econometric and statistical modeling with python.” Proceedings of the 9th Python in Science Conference (2010)
+- OpenCV: Bradski G., The OpenCV LibraryDr. Dobb's Journal of Software Tools (2000)
