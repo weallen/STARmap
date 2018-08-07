@@ -8,12 +8,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def GetQHulls(labels):
+    labels += 1
     Nlabels = labels.max()
     hulls = []
     coords = []
     num_cells = 0
     print('blah')
-    for i, region in enumerate(regionprops(labels)):    
+    for i in range(Nlabels):#enumerate(regionprops(labels)):    
         print(i,"/",Nlabels)
         curr_coords = np.argwhere(labels==i)
         # size threshold of > 100 pixels and < 100000
@@ -22,7 +23,7 @@ def GetQHulls(labels):
             hulls.append(ConvexHull(curr_coords))
             coords.append(curr_coords)
     print("Used %d / %d" % (num_cells, Nlabels))
-    return hulls, coords
+    return hulls, coords 
 
 
 def hull_to_polygon(hull):    
