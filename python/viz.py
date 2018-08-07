@@ -1,20 +1,23 @@
+from __future__ import print_function
 from scipy.spatial import ConvexHull
 from skimage.transform import downscale_local_mean
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
-from __future__ import print_function
 from skimage.measure import regionprops
+import numpy as np
+import matplotlib.pyplot as plt
 
 def GetQHulls(labels):
     Nlabels = labels.max()
     hulls = []
     coords = []
     num_cells = 0
+    print('blah')
     for i, region in enumerate(regionprops(labels)):    
         print(i,"/",Nlabels)
-        curr_coords = region.coords #np.argwhere(labels == i)
+        curr_coords = np.argwhere(labels==i)
         # size threshold of > 100 pixels and < 100000
-        if curr_coords.shape[0] < 100000 and region.area > 100:
+        if curr_coords.shape[0] < 100000 and curr_coords.shape[0] > 1000:
             num_cells += 1
             hulls.append(ConvexHull(curr_coords))
             coords.append(curr_coords)
@@ -45,8 +48,9 @@ def plot_poly_cells_expression(nissl, hulls, expr, cmap, good_cells=None,width=2
         polys = [p for i,p in enumerate(polys) if i in good_cells]
     p = PatchCollection(polys,alpha=alpha, cmap=cmap,linewidths=0)
     p.set_array(expr)
-    p.set_clim(vmin=0, vmax=max(colors))        
+    p.set_clim(vmin=0, vmax=expr.max())        
     plt.gca().add_collection(p)
+    plt.imshow(nissl.T, cmap=plt.cm.gray_r,alpha=0.15)
     plt.axis('off')
 
 def plot_poly_cells_cluster(nissl, hulls, colors, cmap, good_cells=None,width=2, height=9,figscale=10, rescale_colors=False,alpha=1,vmin=None,vmax=None):
