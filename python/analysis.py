@@ -84,11 +84,14 @@ class STARmapAnalysis(object):
     def subset_cells(self, cell_names):
         pass
 
-    def add_data(self, data, group=None,tpm_norm=False,use_genes=None):
+    def add_data(self, data, group=None,tpm_norm=False,use_genes=None, cluster_ident_path=None):
         """
         Add data to data matrix, keeping track of source.
-        :input min_genes: include cells expressing >= min_genes
-        :input min_cells: include genes expressed in >= min_cells 
+        Inputs:
+            group: numeric id of experiment
+            tpm_norm: normalize raw data to TPM (transcripts per million)
+            use_genes: only include listed geens
+            cluster_ident_path: load cluster identities from CSV file (of format cell_num,cluster_id,cluster_name per line)        
         """
         
         
@@ -106,7 +109,12 @@ class STARmapAnalysis(object):
         else:
             meta = pd.DataFrame(np.vstack((np.ones((len(reads_per_cell),),dtype=np.int)*self._nexpt, reads_per_cell, genes_per_cell)).T, \
                                       columns=["orig_ident", "reads_per_cell", "genes_per_cell"])
-        
+
+        if cluster_ident_path is not None:
+            labels = pd.read_csv(cluster_ident_path)
+            meta['cluster_id'] = labels["ClusterID"]
+            meta['cluster_name'] = labels['ClusterName']
+
         if self._nexpt == 0:
             self._raw_data = data
             self._meta = meta
@@ -118,13 +126,9 @@ class STARmapAnalysis(object):
         self._ncell, self._ngene = self._data.shape
 
         self._all_ident = np.array(self._meta['orig_ident'])
-        self._good_cells = np.ones((self._ncell,))
-        self._good_genes = np.ones((self._ngene,))
 
-    def save_clust_idents(self, labels=None):
-        """
-        Save out cluster identities (with optional textual labels)
-        """
+        self._good_cells = np.ones((self._ncell,),dtype=np.bool)
+        self._good_genes = np.ones((self._ngene,),dtype=np.bool)
 
     #
     # PREPROCESSING FUNCTIONS
@@ -143,7 +147,8 @@ class STARmapAnalysis(object):
     def filter_cells_by_feature(self, feature_name, low_thresh, high_thresh):
         m = self._meta[feature_name].values
         to_keep = np.logical_and(m > low_thresh, m <= high_thresh)
-        self._good_cells = np.logical_and(self._good_cells, to_keep)
+        print(np.sum(to_keep))
+        self._good_cells[self._good_cells] = to_keep
         self._raw_data = self._raw_data.loc[to_keep,:]
         self._data = self._data.loc[to_keep,:]
         if self._scaled is not None:
