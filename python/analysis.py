@@ -46,6 +46,12 @@ class STARmapAnalysis(object):
         self._nissl = None
         self._hulls = None
 
+        # original identity of all cells (including those filtered out)
+        self._all_ident = None
+        # binary array of which cells/genes are included and which are filtered out
+        self._good_cells = None
+        self._good_genes = None
+
     # basic usage:
     # S = STARmapAnalysis()
     # S.load_data(data_dir)
@@ -57,8 +63,12 @@ class STARmapAnalysis(object):
     #
     
         
-#        self.add_data()
-        # rows are cells
+
+    #def save_cluster_labels_by_experiment(self, cell_type_names=None):
+    #    if cell_type_names is None:
+    #        clust_labels = np.array([cell_type_names[i] for i in self._clusts])
+    #    else:
+    #        clust_labels = np.array(['NA' for i in self._clusts])
 
     def get_cells_by_experiment(self, idx, use_genes=None,use_scaled=False):
         expt_idx = np.argwhere(self._meta["orig_ident"]==idx).flatten()
@@ -106,15 +116,24 @@ class STARmapAnalysis(object):
         self._data = self._raw_data
         self._nexpt += 1
         self._ncell, self._ngene = self._data.shape
-            
 
-    
+        self._all_ident = np.array(self._meta['orig_ident'])
+        self._good_cells = np.ones((self._ncell,))
+        self._good_genes = np.ones((self._ngene,))
+
+    def save_clust_idents(self, labels=None):
+        """
+        Save out cluster identities (with optional textual labels)
+        """
+
     #
     # PREPROCESSING FUNCTIONS
     #
     def filter_cells_by_expression(self, min_genes = 10, min_cells = 10):
         good_cells = (self._raw_data.values > 0).sum(axis=1)>min_genes 
         good_genes = (self._raw_data.values > 0).sum(axis=0)>min_cells
+        self._good_cells = np.logical_and(self._good_cells, good_cells)
+        self._good_genes = np.logical_and(self._good_genes, good_genes)
         self._raw_data = self._raw_data.loc[good_cells,:]
         self._raw_data = self._raw_data.loc[:,good_genes]
         self._data = self._data.loc[good_cells,:]
@@ -124,6 +143,7 @@ class STARmapAnalysis(object):
     def filter_cells_by_feature(self, feature_name, low_thresh, high_thresh):
         m = self._meta[feature_name].values
         to_keep = np.logical_and(m > low_thresh, m <= high_thresh)
+        self._good_cells = np.logical_and(self._good_cells, to_keep)
         self._raw_data = self._raw_data.loc[to_keep,:]
         self._data = self._data.loc[to_keep,:]
         if self._scaled is not None:
@@ -268,7 +288,7 @@ class STARmapAnalysis(object):
         self._clusts = temp
 
     def subset_by_cellidx(self, cell_ids):
-        S = SnailSeqAnalysis()
+        S = STARmapAnalysis()
         S._raw_data = self._raw_data.iloc[cell_ids,:] # raw data
         S._data = self._data.iloc[cell_ids,:] # data that has been normalized (log + total count)
         S._scaled = self._scaled.iloc[cell_ids,:] # scaled data
