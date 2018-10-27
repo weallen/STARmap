@@ -7,6 +7,16 @@ from skimage.measure import regionprops
 import numpy as np
 import matplotlib.pyplot as plt
 
+def plot_heatmap_with_labels(data_obj, degenes,cmap,show_axis=True, font_size=10):
+    g = plt.GridSpec(2,1, wspace=0.01, hspace=0.01, height_ratios=[0.5,10])
+    ax = plt.subplot(g[0])
+    ax.imshow(np.expand_dims(np.sort(data_obj._clusts),1).T,aspect='auto',interpolation='none',cmap=cmap)
+    ax.axis('off')
+    ax = plt.subplot(g[1])
+    data_obj.plot_heatmap(list(degenes), fontsize=font_size,use_imshow=False,ax=ax)
+    if not show_axis:
+        plt.axis('off')
+
 def GetQHulls(labels):
     labels += 1
     Nlabels = labels.max()
